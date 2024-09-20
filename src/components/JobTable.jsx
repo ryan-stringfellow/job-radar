@@ -44,10 +44,10 @@ const JobTable = ({ setIsSearchForm }) => {
                     <tr>
                       <td className="column">{company}</td>
                       <td className="column">
-                        <a href={final_url}>{job_title}</a>
+                        <a href={final_url} target="_blank">{job_title}</a>
                       </td>{" "}
                       <td className="column">
-                        <a href={final_url}>{final_url}</a>
+                        <a href={final_url} target="_blank">{final_url}</a>
                       </td>
                       <td>{date_posted}</td>
                       <td>{new Date(discovered_at).toLocaleString()}</td>
