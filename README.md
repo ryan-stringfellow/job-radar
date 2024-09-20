@@ -19,5 +19,5 @@ Simply run `npm start`
 - If you click `Submit` button, you will see list of jobs available.
 
 ## Note
-- For free versions of theirstack, they hide company name and other info as default. But you can still see the job title and link.
+- For free versions of [theirstack](https://theirstack.com/en), they hide company name and other info as default. But you can still see the job title and link.
 - For paid versions, you can enjoy fully.
