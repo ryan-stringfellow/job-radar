@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import React, { useState } from "react";
+import JobTable from "./components/JobTable";
+import SearchForm from "./components/SearchForm";
+import { FormProvider } from "./contexts/FormContext";
+// import { JobsProvider } from "./contexts/JobsContext";
 
 function App() {
+  const [isSearchForm, setIsSearchForm] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <FormProvider>
+      {/* <JobsProvider> */}
+      <div className="App">
+        {!isSearchForm ? (
+          <SearchForm setIsSearchForm={setIsSearchForm} />
+        ) : (
+          <JobTable setIsSearchForm={setIsSearchForm} />
+        )}
+      </div>
+      {/* </JobsProvider> */}
+    </FormProvider>
   );
 }
 
