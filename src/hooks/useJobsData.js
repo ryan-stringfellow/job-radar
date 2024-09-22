@@ -1,16 +1,28 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import villaToken from "../data/token.json";
 import { useForm } from "../contexts/FormContext";
 
 const useJobsData = () => {
+  const { formData } = useForm();
+  const { pastXDays, token, searchQueryInJobTitle, techQuery } = formData;
+
   const [jobsData, setJobsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(20);
 
-  const { formData } = useForm();
-  const { limit, pastXDays, token, searchQueryInJobTitle, techQuery } =
-    formData;
+  const nextPage = () => {
+    setPage((prev) => prev + 1);
+  };
+
+  const prevPage = () => {
+    setPage((prev) => prev - 1);
+  };
+
+  const goToPage = (page) => {
+    setPage(page);
+  };
 
   const url = "https://api.theirstack.com/v1/jobs/search";
   const queryParams = {
@@ -19,7 +31,7 @@ const useJobsData = () => {
   };
   const payload = {
     blur_company_data: true,
-    include_total_results: false,
+    include_total_results: true,
     job_country_code_or: ["US"],
     job_technology_slug_or: techQuery,
     job_title_or: searchQueryInJobTitle,
@@ -43,7 +55,7 @@ const useJobsData = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        params: queryParams,
+        params: { ...queryParams, limit, page },
       });
 
       setJobsData(response.data);
@@ -54,10 +66,25 @@ const useJobsData = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    setPage(0);
+  }, [limit]);
 
-  return { jobsData, loading, error, refetch: fetchData };
+  useEffect(() => {
+    fetchData();
+  }, [limit, page]);
+
+  return {
+    jobsData,
+    loading,
+    error,
+    refetch: fetchData,
+    nextPage,
+    prevPage,
+    goToPage,
+    setLimit,
+    page,
+    limit,
+  };
 };
 
 export default useJobsData;

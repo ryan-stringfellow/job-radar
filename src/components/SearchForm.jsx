@@ -23,16 +23,6 @@ const SearchForm = ({ setIsSearchForm }) => {
   return (
     <form onSubmit={handleSubmit} style={styles.form}>
       <div style={styles.inputGroup}>
-        <label style={styles.label}>Limit:</label>
-        <input
-          type="number"
-          value={formData.limit}
-          onChange={(e) => updateLimit(e.target.value)}
-          style={styles.input}
-        />
-      </div>
-
-      <div style={styles.inputGroup}>
         <label style={styles.label}>Past X Days:</label>
         <input
           type="number"

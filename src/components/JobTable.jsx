@@ -1,23 +1,102 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import useJobsData from "../hooks/useJobsData";
 import "./JobTable.css";
 
 const JobTable = ({ setIsSearchForm }) => {
-  const { jobsData, loading, error, refetch } = useJobsData();
+  const {
+    jobsData,
+    loading,
+    error,
+    refetch,
+    page,
+    limit,
+    nextPage,
+    prevPage,
+    setLimit,
+  } = useJobsData();
+
+  const [applied, setApplied] = useState(new Set());
+
+  useEffect(() => {
+    const appliedJobs = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+    setApplied(new Set(appliedJobs));
+  }, []);
 
   if (error) {
     console.log("🚀 ~ App ~ error:", error);
     return <div>Error occured. Please check network tab</div>;
   }
 
+  const renderPagination = () => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          justifyContent: "center",
+        }}
+      >
+        <span>
+          Page {page + 1} of{" "}
+          {jobsData?.metadata
+            ? Math.ceil(jobsData.metadata.total_results / limit)
+            : 1}
+        </span>
+        <button
+          className="button input"
+          onClick={prevPage}
+          disabled={page === 0}
+        >
+          Previous
+        </button>
+        <button
+          className="button input"
+          onClick={nextPage}
+          disabled={
+            jobsData?.metadata &&
+            page === Math.ceil(jobsData.metadata.total_results / limit) - 1
+          }
+        >
+          Next
+        </button>
+        <select
+          className="input"
+          value={limit}
+          onChange={(e) => setLimit(e.target.value)}
+        >
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+      </div>
+    );
+  };
+
+  const onClickRow = (id) => () => {
+    setApplied((prev) => {
+      if (!prev.has(id)) {
+        const newSet = new Set(prev);
+        newSet.add(id);
+        localStorage.setItem("appliedJobs", JSON.stringify(Array.from(newSet)));
+        return newSet;
+      }
+      return prev;
+    });
+  };
+
   return (
     <div className="job-table-container">
-      <button className="refresh button" onClick={refetch}>
+      <button className="refresh button input" onClick={refetch}>
         ⎋ Refresh
       </button>
-      <button className="back button" onClick={() => setIsSearchForm(false)}>
+      <button
+        className="back button input"
+        onClick={() => setIsSearchForm(false)}
+      >
         ⬅ Back
       </button>
+      {renderPagination()}
       {!loading ? (
         <table id="data-table">
           <thead>
@@ -34,6 +113,7 @@ const JobTable = ({ setIsSearchForm }) => {
               .filter(({ company }) => company.toLowerCase() !== "cybercoders")
               .map(
                 ({
+                  id,
                   job_title,
                   company,
                   date_posted,
@@ -41,13 +121,25 @@ const JobTable = ({ setIsSearchForm }) => {
                   discovered_at,
                 }) => {
                   return (
-                    <tr>
+                    <tr className={applied.has(id) ? "applied" : ""} key={id}>
                       <td className="column">{company}</td>
                       <td className="column">
-                        <a href={final_url} target="_blank">{job_title}</a>
+                        <a
+                          href={final_url}
+                          target="_blank"
+                          onClick={onClickRow(id)}
+                        >
+                          {job_title}
+                        </a>
                       </td>{" "}
                       <td className="column">
-                        <a href={final_url} target="_blank">{final_url}</a>
+                        <a
+                          href={final_url}
+                          target="_blank"
+                          onClick={onClickRow(id)}
+                        >
+                          {final_url}
+                        </a>
                       </td>
                       <td>{date_posted}</td>
                       <td>{new Date(discovered_at).toLocaleString()}</td>
@@ -60,6 +152,7 @@ const JobTable = ({ setIsSearchForm }) => {
       ) : (
         <div>Loading...</div>
       )}
+      {renderPagination()}
     </div>
   );
 };
