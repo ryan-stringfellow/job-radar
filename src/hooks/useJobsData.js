@@ -1,6 +1,13 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useForm } from "../contexts/FormContext";
+
+const url = "https://api.theirstack.com/v1/jobs/search";
+
+const queryParams = {
+  source: "app",
+  session_id: "01920b58-269c-7e64-8f18-dcae6269e538",
+};
 
 const useJobsData = () => {
   const { formData } = useForm();
@@ -24,30 +31,27 @@ const useJobsData = () => {
     setPage(page);
   };
 
-  const url = "https://api.theirstack.com/v1/jobs/search";
-  const queryParams = {
-    source: "app",
-    session_id: "01920b58-269c-7e64-8f18-dcae6269e538",
-  };
-  const payload = {
-    blur_company_data: true,
-    include_total_results: true,
-    job_country_code_or: ["US"],
-    job_technology_slug_or: techQuery,
-    job_title_or: searchQueryInJobTitle,
-    limit,
-    order_by: [
-      {
-        desc: true,
-        field: "discovered_at",
-      },
-    ],
-    page: 0,
-    posted_at_max_age_days: pastXDays,
-    remote: true,
-  };
+  const payload = useMemo(
+    () => ({
+      blur_company_data: true,
+      include_total_results: true,
+      job_country_code_or: ["US"],
+      job_technology_slug_or: techQuery,
+      job_title_or: searchQueryInJobTitle,
+      order_by: [
+        {
+          desc: true,
+          field: "discovered_at",
+        },
+      ],
+      page: 0,
+      posted_at_max_age_days: pastXDays,
+      remote: true,
+    }),
+    [techQuery, searchQueryInJobTitle, pastXDays]
+  );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.post(url, payload, {
@@ -63,7 +67,7 @@ const useJobsData = () => {
       setError(err);
     }
     setLoading(false);
-  };
+  }, [limit, page, payload, token]);
 
   useEffect(() => {
     setPage(0);
@@ -71,7 +75,7 @@ const useJobsData = () => {
 
   useEffect(() => {
     fetchData();
-  }, [limit, page]);
+  }, [limit, page, fetchData]);
 
   return {
     jobsData,
