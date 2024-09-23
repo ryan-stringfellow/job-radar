@@ -128,6 +128,7 @@ const JobTable = ({ setIsSearchForm }) => {
                           href={final_url}
                           target="_blank"
                           onClick={onClickRow(id)}
+                          rel="noreferrer"
                         >
                           {job_title}
                         </a>
@@ -137,6 +138,7 @@ const JobTable = ({ setIsSearchForm }) => {
                           href={final_url}
                           target="_blank"
                           onClick={onClickRow(id)}
+                          rel="noreferrer"
                         >
                           {final_url}
                         </a>
