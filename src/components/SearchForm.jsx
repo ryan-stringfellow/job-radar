@@ -1,11 +1,9 @@
 import React, { useContext } from "react";
 import { FormContext } from "../contexts/FormContext";
-import useJobsData from "../hooks/useJobsData";
 
 const SearchForm = ({ setIsSearchForm }) => {
   const {
     formData,
-    updateLimit,
     updatePastXDays,
     updateToken,
     updateSearchQueryInJobTitle,
